@@ -7,6 +7,7 @@ import time
 # Read the csv file
 data_df = pd.read_csv('OtherData/Data_train.csv')
 
+count = 1
 
 # Get the distance between two cities
 def get_distance(url):
@@ -24,6 +25,9 @@ def get_distance(url):
     # Wait for 1 second
     time.sleep(1)
 
+    # Print the counter to keep track of progress
+    print(count, ' - ', results[0].text)
+
     # Return the distance
     return results[0].text
 
@@ -35,13 +39,13 @@ subs_data_df = data_df[['Source', 'Destination', 'Route']]
 city_codes = []
 distance = []
 
+
 for index, row in subs_data_df.iterrows():
     # split the route into a list
     city_codes.append(str(row['Route']).split(';'))
 
 # Get the distance between the cities
-# for i in range(len(city_codes)):
-for i in range(250):
+for i in range(len(city_codes)):
     match len(city_codes[i]):
         case 2:
             url = "https://www.distance.to/" + city_codes[i][0] + "/" + city_codes[i][1]
@@ -53,9 +57,21 @@ for i in range(250):
             url = "https://www.distance.to/" + city_codes[i][0] + "/" + city_codes[i][1] + "/" + \
                   city_codes[i][2] + "/" + city_codes[i][3]
             distance.append(get_distance(url))
+        case 5:
+            url = "https://www.distance.to/" + city_codes[i][0] + "/" + city_codes[i][1] + "/" + \
+                    city_codes[i][2] + "/" + city_codes[i][3] + "/" + city_codes[i][4]
+            distance.append(get_distance(url))
+        case 6:
+            url = "https://www.distance.to/" + city_codes[i][0] + "/" + city_codes[i][1] + "/" + \
+                    city_codes[i][2] + "/" + city_codes[i][3] + "/" + city_codes[i][4] + "/" + city_codes[i][5]
+            distance.append(get_distance(url))
+
+    count += 1
+
 
 with open('OtherData/Distance_between_cities.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(['Source', 'Destination', 'Route', 'Distance_in_km'])
     for i in range(len(data_df)):
         writer.writerow([data_df['Source'][i], data_df['Destination'][i], data_df['Route'][i], distance[i]])
+
