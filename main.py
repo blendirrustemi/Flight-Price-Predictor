@@ -83,7 +83,6 @@ for i, airline in enumerate(top_destinations['Airline'].unique()):
 plt.tight_layout()
 plt.show()
 
-
 # Analyze correlation between duration of flight and price ------
 corr_duration_price = data_df['Duration'].corr(data_df['Price_in_Euro'])  # correlation ranges from -1 to 1
 print('Correlation between Duration and Price in EUR: {:.2f}'.format(corr_duration_price))
@@ -102,7 +101,9 @@ plt.ylabel('Price in Euro')
 plt.title('Correlation between Total Stops and Price')
 plt.show()
 
-# Analyze correlation between date/time and price
-# Analyze route popularity, which Source -> Destination routes are the most popular
-# Examine competition between Airlines, examine how different airlines compete with each other on different routes by comparing prices, flight frequency, and other factors.
-# Predict flight prices
+
+# TODO:
+#  Analyze correlation between date/time and price
+#  Analyze route popularity, which Source -> Destination routes are the most popular
+#  Examine competition between Airlines, examine how different airlines compete with each other on different routes by comparing prices, flight frequency, and other factors.
+#  Predict flight prices
