@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -8,6 +9,7 @@ from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 import plotly.express as px
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 
 # pd.set_option('display.max_columns', None) # ALlows to display all columns
@@ -146,18 +148,36 @@ plt.title('Flight Prices by Day of the Week')
 plt.show()
 
 
-# Convert the Time to a correct format, and split the day into 4 quarters
+# Convert the Time to a correct format, and split the day into 4 quarters ----------------------------
+# Convert the 'Dep_Time' column to datetime
 data_df['Dep_Time'] = pd.to_datetime(data_df['Dep_Time'], format='%H:%M')
-data_df['Dep_Time_Part'] = pd.cut(data_df['Dep_Time'].dt.hour, bins=[0, 6, 12, 18, 24],
-                                  labels=['Late Night', 'Morning', 'Afternoon', 'Evening'], include_lowest=True)
-data_df['Dep_Time'] = data_df['Dep_Time'].dt.time
+
+# Create a new column for the time of day
+data_df['Dep_Time_Part'] = pd.cut(data_df['Dep_Time'].dt.hour,
+                                  bins=[0, 6, 12, 18, 24],
+                                  labels=['Late Night', 'Morning', 'Afternoon', 'Evening'],
+                                  include_lowest=True)
+
+# Calculate the average price for each time of day
+dep_time_prices = data_df.groupby('Dep_Time_Part')['Price_in_Euro'].mean().reset_index()
+
+# Sort the values by time of day
+dep_time_prices.sort_values(by='Dep_Time_Part', inplace=True)
+
+# Create the bar plot using matplotlib
+plt.figure(figsize=(10, 6))
+plt.bar(dep_time_prices['Dep_Time_Part'], dep_time_prices['Price_in_Euro'])
+plt.title('Average Flight Prices by Time of Day')
+plt.xlabel('Time of Day')
+plt.ylabel('Average Price in Euro')
+plt.show()
 
 
 #  Predict flight prices ----------------------------
 print("-------------- Prediction --------------")
-# Replace 'X' with the actual features from your dataset, excluding 'Date_of_Journey'
+# X - features
 X = data_df[['Duration', 'Total_Stops']]
-# Replace 'y' with the actual target variable from your dataset
+# y - target variable
 y = data_df['Price_in_Euro']
 
 # Splitting Data into training and evaluation
@@ -198,7 +218,25 @@ y_predict = forest.predict(X_test)
 df = pd.DataFrame(y_predict, columns=['Price'])
 
 # Storing the prices in Excel format
-df.to_excel('answers.xlsx', index=False)
+df.to_excel('Predictions/Flight_Predictions.xlsx', index=False)
+
+
+# Compare the Prices with the Predicted ----------------------------
+# Create a DataFrame with actual and predicted prices
+df = pd.DataFrame({'Actual_Price': y_test, 'Predicted_Price': y_predict})
+
+# Calculate evaluation metrics
+rmse = np.sqrt(mean_squared_error(df['Actual_Price'], df['Predicted_Price']))
+mae = mean_absolute_error(df['Actual_Price'], df['Predicted_Price'])
+r2 = r2_score(df['Actual_Price'], df['Predicted_Price'])
+
+df.to_excel('Predictions/actual_predicted_prices.xlsx', index=False)
+
+# Print evaluation metrics
+print('RMSE:', rmse)
+print('MAE:', mae)
+print('R-squared:', r2)
+
 
 
 # Interactive visualization using Plotly ----------------------------
