@@ -12,7 +12,7 @@ import plotly.express as px
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 
-# pd.set_option('display.max_columns', None) # ALlows to display all columns
+# pd.set_option('display.max_columns', None) # Allows to display all columns
 
 data_train_df = pd.read_csv('Datasets/Data_train_id.csv')
 distance_df = pd.read_csv('Datasets/Data_distance.csv')
@@ -37,7 +37,8 @@ IQR = Q3 - Q1
 lower_bound = Q1 - 1.5 * IQR
 upper_bound = Q3 + 1.5 * IQR
 
-data_df = data_df[(data_df['Price_in_Euro'] >= lower_bound) & (data_df['Price_in_Euro'] <= upper_bound)]
+data_df = data_df[(data_df['Price_in_Euro'] >= lower_bound) &
+                  (data_df['Price_in_Euro'] <= upper_bound)]
 
 # convert the Total_Stops column from "non-stop", "1 stop, "2 stops", etc. to 0, 1, 2, etc
 data_df['Total_Stops'] = data_df['Total_Stops'].replace({'non-stop': 0, '1 stop': 1, '2 stops': 2,
@@ -172,11 +173,18 @@ plt.xlabel('Time of Day')
 plt.ylabel('Average Price in Euro')
 plt.show()
 
+# Remove the comma from the distance_in_km
+def format_distance(dataset):
+    dataset["Distance_in_km"] = dataset["Distance_in_km"].str.replace(",", "").astype(float)
+    return dataset
+
+modified_dataset = format_distance(data_df)
+
 
 #  Predict flight prices ----------------------------
 print("-------------- Prediction --------------")
 # X - features
-X = data_df[['Duration', 'Total_Stops']]
+X = data_df[['Duration', 'Total_Stops', 'Distance_in_km']]
 # y - target variable
 y = data_df['Price_in_Euro']
 

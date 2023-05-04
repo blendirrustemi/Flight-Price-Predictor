@@ -69,7 +69,7 @@ for i in range(len(city_codes)):
     count += 1
 
 
-with open('OtherData/Distance_between_cities.csv', 'w') as csv_file:
+with open('Datasets/Distance_between_cities.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(['Source', 'Destination', 'Route', 'Distance_in_km'])
     for i in range(len(data_df)):
